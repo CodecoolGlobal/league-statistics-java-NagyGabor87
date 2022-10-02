@@ -2,7 +2,6 @@ package com.codecool.leaguestatistics.model;
 
 import com.codecool.leaguestatistics.controller.Season;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +43,9 @@ public class LeagueStatistics {
      * @return Collection of selected Teams.
      */
     public static List<Team> getTopTeamsWithLeastLoses(List<Team> teams, int teamsNumber) {
-        return teams.stream().limit(teamsNumber).sorted(Comparator.comparing(Team::getLoses)).collect(Collectors.toList());
+        return teams.stream().sorted(Comparator.comparing(Team::getLoses)
+                .thenComparing(Team::getCurrentPoints, Comparator.reverseOrder()))
+                .limit(teamsNumber).collect(Collectors.toList());
     }
 
     /**
@@ -58,7 +59,8 @@ public class LeagueStatistics {
      * Gets all teams, where there are players with no scored goals.
      */
     public static List<Team> getTeamsWithPlayersWithoutGoals(List<Team> teams){
-        throw new RuntimeException("getTeamsWithPlayersWithoutGoals method not implemented");
+        return teams.stream().filter(Team -> Team.getPlayers().stream().anyMatch(player -> player.getGoals() == 0))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -67,14 +69,16 @@ public class LeagueStatistics {
      * @return Collection of Players with given or higher number of goals scored.
      */
     public static List<Player> getPlayersWithAtLeastXGoals(List<Team> teams, int goals) {
-        throw new RuntimeException("getPlayersWithAtLeastXGoals method not implemented");
+        return teams.stream().flatMap(Team -> Team.getPlayers().stream()).filter(Player -> Player.getGoals() >= goals)
+                .collect(Collectors.toList());
     }
 
     /**
      * Gets the player with the highest skill rate for given Division.
      */
     public static Player getMostTalentedPlayerInDivision(List<Team> teams, Division division) {
-        throw new RuntimeException("getMostTalentedPlayerInDivision method not implemented");
+       return teams.stream().filter(Team -> Team.getDivision() == division).flatMap(Team -> Team.getPlayers().stream())
+               .max(Comparator.comparing(Player::getSkillRate)).get();
     }
 
     /**
@@ -83,6 +87,7 @@ public class LeagueStatistics {
      * If there is more than one division with the same amount current points, then check the amounts of wins.
      */
     public static Division getStrongestDivision(List<Team> teams) {
-        throw new RuntimeException("getStrongestDivision method not implemented");
+        return teams.stream().sorted(Comparator.comparing(Team::getCurrentPoints, Comparator.reverseOrder())
+                .thenComparing(Team::getWins, Comparator.reverseOrder())).collect(Collectors.toList()).get(0).getDivision();
     }
 }

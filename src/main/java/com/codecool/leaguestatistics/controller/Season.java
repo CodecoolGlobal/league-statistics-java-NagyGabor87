@@ -28,8 +28,7 @@ public class Season {
     public void run() {
         this.league = LeagueFactory.createLeague(6);
         playAllGames();
-        System.out.println(LeagueStatistics.getTopPlayersFromEachTeam(league));
-        // Call Display methods below
+        Display.displayLeagueTable(league);
 
     }
 
