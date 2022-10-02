@@ -1,7 +1,11 @@
 package com.codecool.leaguestatistics.controller;
 
+import com.codecool.leaguestatistics.Utils;
 import com.codecool.leaguestatistics.factory.LeagueFactory;
+import com.codecool.leaguestatistics.model.LeagueStatistics;
+import com.codecool.leaguestatistics.model.Player;
 import com.codecool.leaguestatistics.model.Team;
+import com.codecool.leaguestatistics.view.Display;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,7 @@ public class Season {
     public void run() {
         this.league = LeagueFactory.createLeague(6);
         playAllGames();
+        System.out.println(LeagueStatistics.getTopPlayersFromEachTeam(league));
         // Call Display methods below
 
     }
@@ -33,14 +38,42 @@ public class Season {
      * Following solution represents the robin-round tournament.
      */
     private void playAllGames() {
-        throw new RuntimeException("playAllGames method not implemented");
+        int numberOfTeams = league.size();
+        List<Team> otherTeams;
+        otherTeams = new ArrayList<>(league);
+        otherTeams.remove(0);
+        int teamSize = otherTeams.size();
+        int halfSize = numberOfTeams / 2;
+        for (int i = 0; i < numberOfTeams - 1; i++) {
+            int teamIndex = i % teamSize;
+            playMatch(otherTeams.get(teamIndex), league.get(0));
+            for (int j =1; j < halfSize;  j++) {
+                int firstTeam = (i+j) % teamSize;
+                int secondTeam = ( i + teamSize - j) % teamSize;
+                playMatch(otherTeams.get(firstTeam), otherTeams.get(secondTeam));
+            }
+        }
     }
 
     /**
      * Plays single game between two teams and displays result after.
      */
     private void playMatch(Team team1, Team team2) {
-        throw new RuntimeException("playMatch method not implemented");
+        int team1Goals = getScoredGoals(team1);
+        int team2Goals = getScoredGoals(team2);
+        if (team2Goals > team1Goals) {
+            team2.setWins(team2.getWins() + 1);
+            team1.setLoses(team1.getLoses() + 1);
+        }
+        if (team1Goals > team2Goals) {
+            team1.setWins(team1.getWins() + 1);
+            team2.setLoses(team2.getLoses() + 1);
+        }
+        if (team1Goals == team2Goals) {
+            team1.setDraws(team1.getDraws() + 1);
+            team2.setDraws(team2.getDraws() + 1);
+        }
+        System.out.println(Display.displayMatchResults(team1,team2,team1Goals,team2Goals));
     }
 
     /**
@@ -49,6 +82,16 @@ public class Season {
      * @return All goals scored by the team in current game
      */
     private int getScoredGoals(Team team) {
-        throw new RuntimeException("getScoredGoals method not implemented");
+        int currentGoals = 0;
+        List<Player> players = team.getPlayers();
+        for (Player player : players) {
+            if (Utils.goalScoringChance(player.getSkillRate())) {
+                player.setGoals(player.getGoals() + 1);
+                currentGoals += 1;
+            }
+
+        }
+        return currentGoals;
     }
+
 }

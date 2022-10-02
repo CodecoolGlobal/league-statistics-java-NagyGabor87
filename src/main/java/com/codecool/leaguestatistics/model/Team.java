@@ -2,6 +2,7 @@ package com.codecool.leaguestatistics.model;
 
 import com.codecool.leaguestatistics.factory.NamesGenerator;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,24 +26,35 @@ public class Team {
     public Team() {
     }
 
+    public int sumOfGoals() {
+        int sum = 0;
+        for (Player player : players) {
+            sum+= player.getGoals();
+        }
+        return sum;
+    }
+
     /**
      * Helper method that finds best player with most scored goals in team
      */
     public Player getBestPlayer() {
-        throw new RuntimeException("getBestPlayer method not implemented");
+        return players.stream().max(Comparator.comparing(Player::getGoals)).get();
     }
 
     /**
      * CurrentPoints is a sum of wins and draws points. For each win 3 points, for draw 1 point.
      */
     public int getCurrentPoints() {
-        throw new RuntimeException("getCurrentPoints method not implemented");
+        return 3 * wins + draws;
     }
 
     public String getName() {
         return name;
     }
 
+    public int nameLength() {
+        return name.length();
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -85,5 +97,17 @@ public class Team {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    @Override
+    public String toString() {
+        return "Team{" +
+                "name='" + name + '\'' +
+                ", division=" + division +
+                ", wins=" + wins +
+                ", draws=" + draws +
+                ", loses=" + loses +
+                ", players=" + players +
+                '}';
     }
 }

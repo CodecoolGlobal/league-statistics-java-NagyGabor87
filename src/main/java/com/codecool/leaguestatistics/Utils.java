@@ -15,4 +15,7 @@ public class Utils {
     public static int getRandomValue(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max);
     }
+    public static boolean goalScoringChance(int chance) {
+        return ThreadLocalRandom.current().nextInt(100) < chance;
+    }
 }

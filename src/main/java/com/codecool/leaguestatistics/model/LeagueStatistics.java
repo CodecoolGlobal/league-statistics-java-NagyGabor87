@@ -1,6 +1,12 @@
 package com.codecool.leaguestatistics.model;
 
+import com.codecool.leaguestatistics.controller.Season;
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Provides all necessary statistics of played season.
@@ -11,21 +17,24 @@ public class LeagueStatistics {
      * Gets all teams with highest points order, if points are equal next deciding parameter is sum of goals of the team.
      */
     public static List<Team> getAllTeamsSorted(List<Team> teams) {
-        throw new RuntimeException("getAllTeamsSorted method not implemented");
+        Stream<Team> stream = teams.stream();
+        Comparator<Team> compareByPointsThenSumOfGoals = Comparator.comparing(Team::getCurrentPoints)
+                .thenComparing(Team::sumOfGoals).reversed();
+        return stream.sorted(compareByPointsThenSumOfGoals).collect(Collectors.toList());
     }
 
     /**
      * Gets all players from each team in one collection.
      */
     public static List<Player> getAllPlayers(List<Team> teams) {
-        throw new RuntimeException("getAllPlayers method not implemented");
+        return teams.stream().flatMap(Team -> Team.getPlayers().stream()).collect(Collectors.toList());
     }
 
     /**
      * Gets team with the longest name
      */
     public static Team getTeamWithTheLongestName(List<Team> teams) {
-        throw new RuntimeException("getTeamWithTheLongestName method not implemented");
+        return teams.stream().max(Comparator.comparingInt(Team::nameLength)).get();
     }
 
     /**
@@ -35,14 +44,14 @@ public class LeagueStatistics {
      * @return Collection of selected Teams.
      */
     public static List<Team> getTopTeamsWithLeastLoses(List<Team> teams, int teamsNumber) {
-        throw new RuntimeException("getTopTeamsWithLeastLoses method not implemented");
+        return teams.stream().limit(teamsNumber).sorted(Comparator.comparing(Team::getLoses)).collect(Collectors.toList());
     }
 
     /**
      * Gets a player with the biggest goals number from each team.
      */
     public static List<Player> getTopPlayersFromEachTeam(List<Team> teams) {
-        throw new RuntimeException("getTopPlayersFromEachTeam method not implemented");
+        return teams.stream().map(Team::getBestPlayer).collect(Collectors.toList());
     }
 
     /**
